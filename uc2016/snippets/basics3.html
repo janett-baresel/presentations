@@ -1,0 +1,35 @@
+<script>
+  function snippet() {
+    var webscene = new WebScene({
+      portalItem: {
+        id: "33a2a791a22b4cf1b23858f463363bfe"
+      }
+    });
+
+    var layer = Layer.fromPortalItem({
+        portalItem: {
+          id: "39dd4914f9274f70a34b9a7e54b7ad60"
+        }
+      }).then(function(layer){
+        webscene.add(layer);
+    });
+
+    var view = new SceneView({
+      container: "viewDiv",
+      map: webscene
+    });
+
+
+
+  }
+
+  modules = ["esri/WebScene", "esri/layers/Layer"];
+
+  settings = {
+    disableOverviewMap: true,
+    disableLog: true
+  };
+
+</script>
+
+<script src="./support/snippet.js"></script>

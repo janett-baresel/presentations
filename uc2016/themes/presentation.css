@@ -172,6 +172,7 @@ body {
   -webkit-linear-gradient(0, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
   -webkit-linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
   -webkit-linear-gradient(0, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  font-size: 20px;
 }
 
 .reveal table {

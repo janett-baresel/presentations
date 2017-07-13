@@ -1,0 +1,68 @@
+$state: purple-bottom-bg$
+
+<h2>Stars</h2>
+
+<div class="two-columns">
+  <div class="left-column">
+
+<div class="code-snippet">
+<pre><code class="lang-js">// fix a convenient date
+view.environment.lighting.date = new Date(2017,06,01,23,00)
+view.environment.lighting.cameraTrackingEnabled = false;
+</code></pre>
+</div>
+
+
+<div class="code-snippet">
+<button class="play" id="demo-stars-button01"></button>
+<pre><code class="lang-js">// toggle the stars
+view.environment.starsEnabled = !view.environment.starsEnabled;
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-stars-button02"></button>
+<pre><code class="lang-js">// find the Big Dipper / Ursa Major
+view.goTo({
+  position: [8.921, 47.234, 104542.49],
+  heading: 310.16,
+  tilt: 134.39
+});
+</code></pre>
+</div>
+
+<img class="code-image"src="../images/alaska.svg">
+
+<div class="code-snippet">
+<button class="play" id="demo-stars-button03"></button>
+<pre><code class="lang-js">// find the North Star / Polaris
+view.goTo({ ... });
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-stars-button04"></button>
+<pre><code class="lang-js">// animate time, see code from last slide
+animationStep();
+</code></pre>
+</div>
+
+  </div>
+  <div class="right-column">
+    <iframe id="demo-time-date" data-src="../demo/demo-stars.html" ></iframe>
+  </div>
+</div>
+
+
+<aside class="notes">
+- looking at the background, you see that we visualize the stars in the sky </br>
+- if you prefer less visual clutter you can deactivate them like this </br>
+- if you decide to keep them they might actually be worth a closer look </br>
+ - instead of just random dots, we actually render them with correct brightness and position as you would find them in the night sky </br>
+- so if we know when and where to look we can for example find the big Dipper </br>
+- which as I learned recently is also present on the flag of alaska </br>
+- the solitary star on the flag is the north star, which we can find here </br>
+- and if we animate things again we see it sitting stable in the sky, which is one of the interesting properties of this star, which you can also see in long exposure photos </br>
+
+
+</aside>

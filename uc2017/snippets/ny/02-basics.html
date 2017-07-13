@@ -42,14 +42,14 @@
       });
 
       var pcLayer = new PointCloudLayer({
-        url: "http://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/USGSNYC_2014_LiDAR/SceneServer"
+        portalItem: {
+          id: "054564b01d7c4dfcac47eb83b7d3577a"
+        }
       });
       map.add(pcLayer);
 
       var sceneLayer = new SceneLayer({
-        portalItem: {
-          id: "2e0761b9a4274b8db52c4bf34356911e"
-        }
+        url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services/NYC/SceneServer/layers/0"
       });
       map.add(sceneLayer);
     });

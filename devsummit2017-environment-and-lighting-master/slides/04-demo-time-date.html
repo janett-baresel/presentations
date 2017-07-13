@@ -1,0 +1,69 @@
+$state: purple-bg$
+
+<h2>Time and Date</h2>
+
+<div class="two-columns">
+  <div class="left-column">
+
+
+<div class="code-snippet">
+<button class="play" id="demo-time-date-button01"></button>
+<pre><code class="lang-js">// print time and date for the current lighting
+var date = view.environment.lighting.date;
+console.log(date);
+</code></pre>
+</div>
+
+<div class="code-output">
+  <pre id="demo-time-date-output01">>></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-time-date-button02"></button>
+<pre><code class="lang-js">// toggle whether the lighting should depend
+// on the current camera position
+var lighting = view.environment.lighting;
+lighting.cameraTrackingEnabled = !lighting.cameraTrackingEnabled;
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-time-date-button03"></button>
+<pre><code class="lang-js">// set lighting to the current date and time
+view.environment.lighting.date = Date.now();
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-time-date-button04"></button>
+<pre><code class="lang-js">// animate time and date
+function animationStep() {
+  // time lapse
+  var date = view.environment.lighting.date;
+  date.setSeconds(date.getSeconds() + 100);
+
+  // assign again so the API knows date changed
+  view.environment.lighting.date = date;
+
+  requestAnimationFrame(animationStep);
+}
+
+animationStep();
+</code></pre>
+</div>
+
+  </div>
+  <div class="right-column">
+    <iframe id="demo-time-date" data-src="../demo/demo-time-date.html" ></iframe>
+  </div>
+</div>
+
+<aside class="notes">
+- we're looking at time and date for 2 reasons </br>
+ - on one hand time and date influence the lighting, we simulate sun lighting based on the current time </br>
+ - suprisingly though by default sun lighting also influences time and date </br>
+- move camera show times </br>
+- we can deactivate this behaviour </br>
+- and we can set the lighting so it fit a specific point in time </br>
+- or animate it over time </br>
+</aside>

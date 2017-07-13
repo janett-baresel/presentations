@@ -1,0 +1,37 @@
+
+<h2>Setup</h2>
+
+<div class="two-columns">
+  <div class="left-column">
+
+<div class="code-snippet">
+<pre><code class="lang-js">// create a map
+var map = new Map({
+  basemap: "topo",
+  ground: "world-elevation"
+});
+
+// create a SceneView and add the map to it
+var view = new SceneView({
+  container: "viewDiv",
+  map: map,
+  camera: {
+    position: [8.5497, 47.3783, 556.6330],
+    heading: 213.2398,
+    tilt: 73.2960
+  }
+});
+</code></pre>
+</div>
+  </div>
+  <div class="right-column">
+    <iframe id="demo-basic-setup" data-src="../demo/demo-basic-setup.html" ></iframe>
+  </div>
+</div>
+
+<aside class="notes">
+- this is the general setup we'll be using for the following demos
+- we create a map which we initialize with a basemap and an elevation layer
+- and then we create a scene view and add the map to it
+- the exact details such as type of basemap might vary, and in some examples we might want to initialize the camera specifically
+</aside>

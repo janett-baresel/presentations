@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="Devsummit 2017 Demo - Stars">
+
+  <title>Devsummit 2017 Demo - Stars</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/4.2/esri/css/main.css">
+  <script src="https://jsdev.arcgis.com/4.2/"></script>
+
+  <!--<link rel="stylesheet" href="../../../arcgis-js-api-4/esri/css/main.css">-->
+  <!--<script src="../../../arcgis-js-api-4/dojo/dojo.js"></script>-->
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/Graphic",
+      "esri/geometry/Point",
+      "esri/symbols/PointSymbol3D",
+      "esri/symbols/ObjectSymbol3DLayer",
+      "dojo/domReady!"
+    ], function(Map, MapView, SceneView, Graphic, Point, PointSymbol3D, ObjectSymbol3DLayer) {
+
+      var map = new Map({
+        basemap: "topo"
+      });
+
+      var view = new SceneView({
+        container: "viewDiv",
+        map: map,
+        zoom: 2,
+        center: [15, 40]
+      });
+
+      window.view = view;
+      view.environment.lighting.date = new Date(Date.UTC(2017,06,02,07,00))
+      view.environment.lighting.cameraTrackingEnabled = false;
+
+      window.toggleStars = () => {
+        view.environment.starsEnabled = !view.environment.starsEnabled;
+      }
+
+      window.findBigDipper = () => {
+        var lighting = view.environment.lighting;
+        view.environment.lighting.date = new Date(Date.UTC(2017,06,02,07,00))
+
+        view.goTo({
+          position: [5.9000, 51.6270, 104542.4900],
+          heading: 307.9749,
+          tilt: 134.3900
+        });
+      }
+
+      window.findPolaris = () => {
+        view.goTo({
+          position: [8.543, 47.409, 11569.65],
+          heading: 2.49,
+          tilt: 136.36
+        }, {
+          duration: 2000
+        })
+      }
+
+      var handle = 0;
+
+      window.toggleAnimation = () => {
+        function animationStep() {
+          // time lapse
+          var date = view.environment.lighting.date;
+          date.setSeconds(date.getSeconds() + 100);
+
+          // assign again so the API knows date changed
+          view.environment.lighting.date = date;
+
+          handle = requestAnimationFrame(animationStep);
+        }
+
+        if (handle === 0) {
+          animationStep();
+        } else {
+          cancelAnimationFrame(handle);
+          handle = 0;
+        }
+
+      }
+
+      // presentation specific
+      view.then(() => {
+        if (window.parent) {
+          var button01 = window.parent.document.getElementById("demo-stars-button01")
+          if (button01) {
+            button01.onclick = window.toggleStars;
+          }
+
+          var button02 = window.parent.document.getElementById("demo-stars-button02")
+          if (button02) {
+            button02.onclick = window.findBigDipper;
+          }
+
+          var button03 = window.parent.document.getElementById("demo-stars-button03")
+          if (button03) {
+            button03.onclick = window.findPolaris;
+          }
+
+          var button04 = window.parent.document.getElementById("demo-stars-button04")
+          if (button04) {
+            button04.onclick = window.toggleAnimation;
+          }
+
+          window.parent.demo = window;
+        }
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+</html>

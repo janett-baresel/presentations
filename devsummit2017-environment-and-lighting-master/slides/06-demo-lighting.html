@@ -1,0 +1,65 @@
+<h2>Light and Shadows</h2>
+
+<div class="two-columns">
+  <div class="left-column">
+
+<div class="code-snippet">
+<pre><code class="lang-js">// add Zurich buildings
+var layer = new SceneLayer({
+  url: "http://tiles.arcgis.com/tiles/..."
+});
+map.add(layer);
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-lighting-button01"></button>
+<pre><code class="lang-js">// init view and date
+view.environment.lighting.date = new Date(...)
+view.camera.goTo(...);
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-lighting-button02"></button>
+<pre><code class="lang-js">// toggle direct shadows
+var light = view.environment.lighting;
+light.directShadowsEnabled = !light.directShadowsEnabled;
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-lighting-button03"></button>
+<pre><code class="lang-js">// toggle ambient occlusion
+var light = view.environment.lighting;
+light.ambientOcclusionEnabled = !light.ambientOcclusionEnabled;
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-lighting-button04"></button>
+<pre><code class="lang-js">// animate time, see code from previous slide
+animationStep();
+</code></pre>
+</div>
+
+  </div>
+  <div class="right-column">
+    <iframe id="demo-time-date" data-src="../demo/demo-lighting.html" ></iframe>
+  </div>
+</div>
+
+
+<aside class="notes">
+    - 2 kinds of lighting in the scene: Sunlight and Ambient light</br>
+
+    - first Sunlight, directional lightsource, surfaces receive more light depending on whether they are facing towards the sun or not</br>
+    - sun light can also cast shadows, by default it doesn't, can be activated like this</br>
+
+    - second Ambient Light. as you might have noticed parts of the scene that are in shadow are not completely black. That's because there's still ambient light lighting those places</br>
+    - Ambient light arrives from all directions evenly and thus lights every piece of surface equally.</br>
+
+    - the amount, direction and color of these two lights depends on the specified date, which is why we can animate it</br>
+
+    - you can see how in a city planning scenario it might be interesting to visualize the shadow cast by a new building onto neighbouring ones throughout the day
+</aside>

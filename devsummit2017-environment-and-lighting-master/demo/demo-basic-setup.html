@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="Devsummit 2017 Demo - Lighting">
+
+  <title>Devsummit 2017 Demo - Lighting</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/4.2/esri/css/main.css">
+  <script src="https://jsdev.arcgis.com/4.2/"></script>
+
+  <!--<link rel="stylesheet" href="../../../arcgis-js-api-4/esri/css/main.css">-->
+  <!--<script src="../../../arcgis-js-api-4/dojo/dojo.js"></script>-->
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/Graphic",
+      "esri/geometry/Point",
+      "esri/symbols/PointSymbol3D",
+      "esri/symbols/ObjectSymbol3DLayer",
+      "esri/layers/SceneLayer",
+      "dojo/domReady!"
+    ], function(Map, MapView, SceneView, Graphic, Point, PointSymbol3D, ObjectSymbol3DLayer, SceneLayer) {
+
+      var map = new Map({
+        basemap: "gray",
+        ground: "world-elevation"
+      });
+
+      var view = new SceneView({
+        container: "viewDiv",
+        map: map,
+        camera: {
+          position: [8.5497, 47.3783, 556.6330],
+          heading: 213.2398,
+          tilt: 73.2960
+        }
+      });
+
+      window.view = view;
+
+      view.environment.lighting.date = new Date(Date.UTC(2017,03,15,12,00))
+      view.environment.lighting.cameraTrackingEnabled = false;
+
+      // window.goToETH = () => {
+      //   view.goTo({
+      //     position: [8.547, 47.377, 493.98],
+      //     heading: 189.30,
+      //     tilt: 84.62
+      //   });
+      // }
+
+      // window.zoomOut = () => {
+      //   view.goTo({
+      //     position: [8.546, 47.380, 615.46],
+      //     heading: 195.42,
+      //     tilt: 75.70
+      //   })
+      // }
+
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+</html>

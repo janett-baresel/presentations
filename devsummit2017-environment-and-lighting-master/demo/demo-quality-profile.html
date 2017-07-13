@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="Devsummit 2017 Demo - Quality Profile - Low">
+
+  <title>Devsummit 2017 Demo - Quality Profile - Low</title>
+  <style>
+    html,
+    body {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+      background-color: rgba(0,0,0,0);
+    }
+    #viewDivLow {
+      display: block;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 49.5%;
+      float: left;
+      background-color: rgba(255,255,255,0.5);
+    }
+    #viewDivHigh {
+      display: block;
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 49.5%;
+      float: right;
+      background-color: rgba(255,255,255,0.5);
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://jsdev.arcgis.com/4.2/esri/css/main.css">
+  <script src="https://jsdev.arcgis.com/4.2/"></script>
+
+  <!--<link rel="stylesheet" href="../../../arcgis-js-api-4/esri/css/main.css">-->
+  <!--<script src="../../../arcgis-js-api-4/dojo/dojo.js"></script>-->
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/Graphic",
+      "esri/geometry/Point",
+      "esri/symbols/PointSymbol3D",
+      "esri/symbols/ObjectSymbol3DLayer",
+      "esri/layers/SceneLayer",
+      "dojo/domReady!"
+    ], function(Map, MapView, SceneView, Graphic, Point, PointSymbol3D, ObjectSymbol3DLayer, SceneLayer) {
+
+      var map = new Map({
+        basemap: "dark-gray",
+        ground: "world-elevation"
+      });
+
+      var camera = {
+        position: [8.5507, 47.3804, 740.0755],
+        heading: 211.4501,
+        tilt: 63.3374
+      };
+
+      var viewLow = new SceneView({
+        container: "viewDivLow",
+        map,
+        camera,
+        qualityProfile: "low"
+      });
+
+      var viewHigh = new SceneView({
+        container: "viewDivHigh",
+        map,
+        camera,
+        qualityProfile: "high"
+      });
+
+      window.viewLow = viewLow;
+      window.viewHigh = viewHigh;
+
+      var layer = new SceneLayer({
+        url: "http://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/ZURICH/SceneServer"
+      });
+      map.add(layer);
+
+      var lowDir
+
+      function syncStep() {
+        // time lapse
+
+        if (viewLow.interacting || viewLow.animation) {
+          viewHigh.camera = viewLow.camera;
+        } else if (viewHigh.interacting || viewHigh.animation) {
+          viewLow.camera = viewHigh.camera;
+        }
+
+        requestAnimationFrame(syncStep);
+      }
+
+      syncStep();
+
+      // presentation specific
+      viewLow.then(() => {
+        viewHigh.then(() => {
+          if (window.parent) {
+            window.parent.demo = window;
+          }
+
+          viewHigh.basemapTerrain.setBorders(true);
+          viewLow.basemapTerrain.setBorders(true);
+        });
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDivLow"></div>
+  <div id="viewDivHigh"></div>
+</body>
+</html>

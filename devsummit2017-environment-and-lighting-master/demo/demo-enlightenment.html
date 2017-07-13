@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="description" content="Devsummit 2017 Demo - Enlightenment">
+
+  <title>Devsummit 2017 Demo - Enlightenment</title>
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="../../../arcgis-js-api-4/esri/css/main.css">
+  <script src="../../../arcgis-js-api-4/dojo/dojo.js"></script>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/views/SceneView",
+      "esri/Graphic",
+      "esri/geometry/Point",
+      "esri/symbols/PointSymbol3D",
+      "esri/symbols/ObjectSymbol3DLayer",
+      "esri/layers/SceneLayer",
+      "dojo/domReady!"
+    ], function(Map, MapView, SceneView, Graphic, Point, PointSymbol3D, ObjectSymbol3DLayer, SceneLayer) {
+
+      var map = new Map({
+        basemap: "gray",
+        ground: "world-elevation"
+      });
+
+      var view = new SceneView({
+        container: "viewDiv",
+        map: map,
+        camera: {
+          position: [16.9842, 27.9989, 4355882.9483],
+          heading: 347.5123,
+          tilt: 26.1355
+        },
+        qualityProfile: "high"
+      });
+
+      view.environment.lighting.directShadowsEnabled = true;
+      view.environment.lighting.ambientOcclusionEnabled = true;
+      view.environment.atmosphereEnabled = false;
+
+      window.view = view;
+
+      function addBoxes() {
+        var _bases = [2,3];
+
+        function compute_HS(index) {
+            let nBases = _bases.length;
+            let result = [0, 0];
+            for (let i = 0; i < nBases; ++i) {
+                result[i] = _compute_HS(index + 1, _bases[i]);
+            }
+            return result;
+        }
+
+        function _compute_HS(index, base) {
+            let result = 0;
+            let f = 1;
+            let i = index;
+            while (i > 0) {
+                f = f / base;
+                result = result + f * (i % base);
+                i = Math.floor(i / base);
+            }
+            return result;
+        }
+
+        var size = 100000;
+
+
+
+        for (var i=0; i < 1000; ++i) {
+          var c = compute_HS(i);
+
+          var objectSymbol = new PointSymbol3D(new ObjectSymbol3DLayer({
+            resource: {
+              primitive: "cube"
+            },
+            height:size,
+            depth: size,
+            width: size,
+            material: {
+              color: Math.random() < 0.2 ? [255,255,255,1] : [Math.random()*255+0, Math.random()*255+0, Math.random()*255+0, 1.0]
+            }
+          }));
+
+          var pt = new Point({ x: c[0]*360.0, y: c[1]*180.0 - 90.0, z: 0.45*size });
+          view.graphics.add(new Graphic({
+            geometry: pt,
+            symbol: objectSymbol
+          }));
+        }
+      }
+
+      addBoxes();
+
+      var basemapIdx = 0;
+      var basemaps = ["gray", "topo"];
+
+      window.switchBasemap = () => {
+        basemapIdx = (basemapIdx + 1) % basemaps.length;
+        map.basemap = basemaps[basemapIdx];
+      }
+
+      // presentation specific
+      view.then(() => {
+        enlightment.viewportSplit = 0.0
+        enlightment.lighting.fixedTerrainLighting = true;
+        window.enlightment.lighting.fixedTerrainLighting = true;
+
+        enlightment.lighting.ambient = {
+         "intensityScale": 1.0
+        }
+        enlightment.lighting.sun = {
+         "intensityScale": 2.0,
+         "shadowScale":0.5,
+         "direction":[
+            0.9197074625259197,
+            -0.37972143940351977,
+            -0.09974874350814103
+         ]
+        }
+        // enlightment.filter.backgroundColor = [1,1,1,0];
+        // enlightment.filter.exposure = 1.2;
+
+        var jsonString = `{"filter":{"saturation": 1.0, "gamma":2.2,"exposure":1.0273972602739727,"backgroundColor":[0.5816936381539515,0.6806126632517893,0.7568627450980392,1]},"lighting":{"ambient":{"intensityScale":0.9628180039138943},"sun":{"intensityScale":1.8551859099804304,"shadowScale":0.5518590998043053,"direction":[0.7090683151746296,-0.5123488462124348,-0.4844799110388363],"_finalShadowScale":0.5518590998043053},"fillLight1":{"intensityScale":0.4931506849315068,"intensity":[1,0.8627450980392157,0.8627450980392157],"altitude":-0.0952929278486141,"angle":2.1148882051563382,"direction":[-0.0052313784380978315,0.9916021986701277,-0.1292196280454566],"cameraRelative":false},"fillLight2":{"intensityScale":0.6575342465753424,"intensity":[0.6920415224913494,0.8180223207758661,0.8823529411764706],"altitude":-0.13218051282227106,"angle":4.1682971020232475,"direction":[-0.29517585697800164,-0.3341014163677866,0.8951242690477905],"cameraRelative":false},"fillLight3":{"intensityScale":0,"intensity":[0.8313725490196079,0.8313725490196079,1],"altitude":-1.5707963267948966,"angle":0.5902013595785129,"direction":[-0.39647924434836107,0.8933019898898722,-0.21169733975595298],"cameraRelative":true},"fixedTerrainLighting":true,"util":null,"poleAmbientBoost":0,"poleLight3Boost":0.43052837573385516,"poleFactor":0.007390391685200726},"viewportSplit":0}`
+
+        enlightment.lighting.util.deserialize(jsonString);
+        view.environmentManager._cameraHandler();
+        enlightment.view._stage.setNeedsRender();
+
+        function makeSwitcher(settings) {
+          var idx = 0;
+          var s = settings;
+
+          return () => {
+            console.log('switch')
+            idx = (idx + 1) % s.length;
+            startTransition(1000, s[idx]);
+          }
+        }
+
+        var switchReset = makeSwitcher([
+          {
+            "lighting.ambient.intensityScale": 0.0,
+            "lighting.sun.intensityScale": 0.0,
+            "lighting.fillLight1.intensityScale": 0.0,
+            "lighting.fillLight2.intensityScale": 0.0,
+            "filter.backgroundColor.0": 0.0,
+            "filter.backgroundColor.1": 0.0,
+            "filter.backgroundColor.2": 0.0,
+            "filter.gamma": 2.2,
+            "filter.saturation": 1.0,
+            "poleLight3Boost": 0.0,
+            "lighting.fillLight3.intensityScale": 0.0,
+            "lighting.fillLight3.intensity.0": 0.0,
+            "lighting.fillLight3.intensity.1": 0.0,
+            "lighting.fillLight3.intensity.2": 0.0,
+          },
+        ])
+
+        var switchAmbient = makeSwitcher([
+          { "lighting.ambient.intensityScale": 0.0 },
+          { "lighting.ambient.intensityScale": 0.9628180039138943 }
+        ]);
+
+        var switchSun = makeSwitcher([
+          { "lighting.sun.intensityScale": 0.0 },
+          { "lighting.sun.intensityScale": 1.8551859099804304 }
+        ])
+
+        var switchFill1 = makeSwitcher([
+          {
+            "lighting.fillLight1.intensityScale": 0.0,
+            "lighting.fillLight1.intensity.0": 1.0,
+            "lighting.fillLight1.intensity.1": 0.0,
+            "lighting.fillLight1.intensity.2": 0.0,
+          },
+          {
+            "lighting.fillLight1.intensityScale": 1.0,
+            "lighting.fillLight1.intensity.0": 1.0,
+            "lighting.fillLight1.intensity.1": 0.0,
+            "lighting.fillLight1.intensity.2": 0.0,
+          },
+          {
+            "lighting.fillLight1.intensityScale": 0.4931506849315068,
+            "lighting.fillLight1.intensity.0": 1.0,
+            "lighting.fillLight1.intensity.1": 0.8627450980392157,
+            "lighting.fillLight1.intensity.2": 0.8627450980392157,
+          }
+        ])
+
+        var switchFill2 = makeSwitcher([
+          {
+            "lighting.fillLight2.intensityScale": 0.0,
+            "lighting.fillLight2.intensity.0": 0.0,
+            "lighting.fillLight2.intensity.1": 0.0,
+            "lighting.fillLight2.intensity.2": 1.0,
+          },
+          {
+            "lighting.fillLight2.intensityScale": 1.0,
+            "lighting.fillLight2.intensity.0": 0.0,
+            "lighting.fillLight2.intensity.1": 0.0,
+            "lighting.fillLight2.intensity.2": 1.0,
+          },
+          {
+            "lighting.fillLight2.intensityScale": 0.6575342465753424,
+            "lighting.fillLight2.intensity.0": 0.6920415224913494,
+            "lighting.fillLight2.intensity.1": 0.8180223207758661,
+            "lighting.fillLight2.intensity.2": 0.8823529411764706,
+          }
+        ])
+
+        var switchBackground = makeSwitcher([
+          {
+            "filter.backgroundColor.0": 0.0,
+            "filter.backgroundColor.1": 0.0,
+            "filter.backgroundColor.2": 0.0
+          },
+          {
+            "filter.backgroundColor.0": 1.0,
+            "filter.backgroundColor.1": 1.0,
+            "filter.backgroundColor.2": 1.0
+          },
+          {
+            "filter.backgroundColor.0": 0.0,
+            "filter.backgroundColor.1": 50/255,
+            "filter.backgroundColor.2": 140/255
+          },
+          {
+            "filter.backgroundColor.0": 0.5816936381539515,
+            "filter.backgroundColor.1": 0.6806126632517893,
+            "filter.backgroundColor.2": 0.7568627450980392
+          },
+        ])
+
+        var switchGamma = makeSwitcher([
+          { "filter.gamma": 2.2 },
+          { "filter.gamma": 1.5 },
+          { "filter.gamma": 1.0 }
+        ])
+
+        var switchSaturationDown = makeSwitcher([
+          { "filter.saturation": 1.0 },
+          { "filter.saturation": 0.5 },
+          { "filter.saturation": 0.1 }
+        ])
+
+        var switchSaturationUp = makeSwitcher([
+          { "filter.saturation": 1.0 },
+          { "filter.saturation": 1.4 },
+          { "filter.saturation": 1.8 }
+        ])
+
+
+        if (window.parent) {
+          var button01 = window.parent.document.getElementById("demo-enlight-button01")
+          if (button01) {
+            button01.onclick = window.switchBasemap;
+          }
+
+          var button02 = window.parent.document.getElementById("demo-enlight-button02")
+          if (button02) {
+            button02.onclick = switchAmbient;
+          }
+
+          var button03 = window.parent.document.getElementById("demo-enlight-button03")
+          if (button03) {
+            button03.onclick = switchSun;
+          }
+
+         var button04 = window.parent.document.getElementById("demo-enlight-button04")
+          if (button04) {
+            button04.onclick = switchFill1;
+          }
+
+          var button05 = window.parent.document.getElementById("demo-enlight-button05")
+          if (button05) {
+            button05.onclick = switchFill2;
+          }
+
+          var buttonbg = window.parent.document.getElementById("demo-enlight-buttonbg")
+          if (buttonbg) {
+            buttonbg.onclick = switchBackground;
+          }
+
+          var button_gamma = window.parent.document.getElementById("demo-enlight-button_gamma")
+          if (button_gamma) {
+            button_gamma.onclick = switchGamma;
+          }
+
+          var button_saturation1 = window.parent.document.getElementById("demo-enlight-button_saturation1")
+          if (button_saturation1) {
+            button_saturation1.onclick = switchSaturationDown;
+          }
+
+          var button_saturation2 = window.parent.document.getElementById("demo-enlight-button_saturation2")
+          if (button_saturation2) {
+            button_saturation2.onclick = switchSaturationUp;
+          }
+
+          var button_reset = window.parent.document.getElementById("demo-enlight-button_reset")
+          if (button_reset) {
+            button_reset.onclick = switchReset;
+          }
+
+
+          window.parent.demo = window;
+        }
+
+        // animation stuff
+
+        var deepGet = function(obj, path){
+          for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
+              obj = obj[path[i]];
+          };
+          return obj;
+        };
+
+        var deepSet = function(obj, path, value){
+          for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
+              if (i===len-1) {
+                obj[path[i]] = value;
+              }
+              obj = obj[path[i]];
+          };
+        };
+
+        var animationHandle = 0;
+
+        var currentAnimation = null;
+
+        window.startTransition = function startTransition(duration, endState) {
+
+          var beginState = {};
+          for (k in endState) {
+            beginState[k] = deepGet(enlightment, k);
+          }
+
+          currentAnimation = {
+            duration,
+            begin: Date.now(),
+            beginState,
+            endState,
+          }
+
+          if (animationHandle === 0) {
+            animationHandle = requestAnimationFrame(transitionStep);
+          }
+        }
+
+        function transitionStep() {
+          if (!currentAnimation) {
+            animationHandle = 0;
+            return;
+          }
+
+          var now = Date.now();
+          var elapsed = now - currentAnimation.begin;
+          var f = Math.min(elapsed / currentAnimation.duration, 1.0);
+
+          for (k in currentAnimation.beginState) {
+            var b = currentAnimation.beginState[k];
+            var e = currentAnimation.endState[k];
+            var value = (1-f) * b + f * e;
+            deepSet(enlightment, k, value);
+          }
+
+          view.environmentManager._cameraHandler();
+          window.enlightment.view._stage.setNeedsRender();
+
+          if (elapsed < currentAnimation.duration) {
+            animationHandle = requestAnimationFrame(transitionStep);
+          } else {
+            currentAnimation = null;
+            animationHandle = 0;
+          }
+        }
+
+
+
+
+      });
+
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+</body>
+</html>
+
+
+<!--{
+   "filter":{
+      "gamma":2.2,
+      "exposure":1.273972602739726,
+      "backgroundColor":[
+         0.5816936381539515,
+         0.6806126632517893,
+         0.7568627450980392,
+         1
+      ]
+   },
+   "lighting":{
+      "ambient":{
+         "intensityScale":1.3972602739726028
+      },
+      "sun":{
+         "intensityScale":1.0332681017612524,
+         "shadowScale":0.5518590998043053,
+         "direction":[
+            0.9413331243177574,
+            0.015603875387053016,
+            -0.33711788462654224
+         ],
+         "_finalShadowScale":0.5518590998043053
+      },
+      "fillLight1":{
+         "intensityScale":0.3287671232876712,
+         "intensity":[
+            1,
+            0.8627450980392157,
+            0.8627450980392157
+         ],
+         "altitude":0,
+         "angle":1.8074916637091962,
+         "direction":[
+            -0.33472265017298747,
+            0.8564764930452514,
+            -0.39294880623572215
+         ]
+      },
+      "fillLight2":{
+         "intensityScale":0.3639921722113503,
+         "intensity":[
+            0.9176470588235294,
+            0.964043082021541,
+            1
+         ],
+         "altitude":-0.3043225760326709,
+         "angle":4.131409517049591,
+         "direction":[
+            -0.33629443950461746,
+            -0.5389303399420914,
+            0.772308318385978
+         ]
+      },
+      "fillLight3":{
+         "intensityScale":0.09393346379647749,
+         "intensity":[
+            0.8313725490196079,
+            0.8313725490196079,
+            1
+         ],
+         "altitude":0.027665688730242666,
+         "angle":0,
+         "direction":[
+            0.8289280027023697,
+            0.4611668791907293,
+            0.3165493261299786
+         ],
+         "cameraRelative":true
+      },
+      "fixedTerrainLighting":true,
+      "util":null,
+      "poleAmbientBoost":0,
+      "poleLight3Boost":0.03131115459882583,
+      "poleFactor":0.08536118010056082
+   },
+   "viewportSplit":0
+}-->

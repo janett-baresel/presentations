@@ -23,9 +23,10 @@
       "esri/views/SceneView",
       "esri/layers/SceneLayer",
       "esri/layers/PointCloudLayer",
+      "esri/layers/GroupLayer",
       "esri/widgets/LayerList",
       "dojo/domReady!"
-    ], function(Map, SceneView, SceneLayer, PointCloudLayer, LayerList) {
+    ], function(Map, SceneView, SceneLayer, PointCloudLayer, GroupLayer, LayerList) {
 
       var map = new Map({
         basemap: "dark-gray",
@@ -43,16 +44,22 @@
       });
 
       var pcLayer = new PointCloudLayer({
-        url: "http://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/USGSNYC_2014_LiDAR/SceneServer"
-      });
-      map.add(pcLayer);
-
-      var sceneLayer = new SceneLayer({
         portalItem: {
-          id: "2e0761b9a4274b8db52c4bf34356911e"
+          id: "054564b01d7c4dfcac47eb83b7d3577a"
         }
       });
-      map.add(sceneLayer);
+
+      var sceneLayer = new SceneLayer({
+        url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services/NYC/SceneServer/layers/0"
+      });
+
+      var groupLayer = new GroupLayer({
+        title: "NY Layers",
+        visibilityMode: "exclusive"
+      });
+
+      groupLayer.addMany([pcLayer, sceneLayer]);
+      map.add(groupLayer);
 
       view.then(function() {
         var layerList = new LayerList({

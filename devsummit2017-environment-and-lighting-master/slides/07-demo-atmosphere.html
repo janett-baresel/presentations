@@ -1,0 +1,76 @@
+<h2>Atmosphere</h2>
+
+<div class="two-columns">
+  <div class="left-column">
+
+<div class="code-snippet">
+<button class="play" id="demo-atmosphere-button01"></button>
+<pre><code class="lang-js">// init view and date
+view.environment.lighting.date = new Date(...)
+view.camera.goTo(...);
+</code></pre>
+</div>
+
+<div class="code-snippet"></div>
+<div class="code-snippet"></div>
+
+<div class="code-snippet">
+<button class="play" id="demo-atmosphere-button02"></button>
+<pre><code class="lang-js">// disable atmosphere completely
+view.environment.atmosphereEnabled = false;
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-atmosphere-button03"></button>
+<pre><code class="lang-js">// set atmosphere quality to "low"
+view.environment.atmosphereEnabled = true;
+view.environment.atmosphere.quality = "low";
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-atmosphere-button04"></button>
+<pre><code class="lang-js">// set atmosphere quality to "high"
+view.environment.atmosphereEnabled = true;
+view.environment.atmosphere.quality = "high";
+</code></pre>
+</div>
+
+<div class="code-snippet"></div>
+<div class="code-snippet"></div>
+
+<div class="code-snippet">
+<button class="play" id="demo-atmosphere-button05"></button>
+<pre><code class="lang-js">// animate time, see code from previous slide
+animationStep();
+</code></pre>
+</div>
+
+<div class="code-snippet">
+<button class="play" id="demo-atmosphere-button06"></button>
+<pre><code class="lang-js">// switch between basemaps: dark-gray / topo / satellite
+switchBasemap();
+</code></pre>
+</div>
+
+  </div>
+  <div class="right-column">
+    <iframe id="demo-time-date" data-src="../demo/demo-atmosphere.html" ></iframe>
+  </div>
+</div>
+
+
+<aside class="notes">
+    - there's basically 3 different atmosphere settings</br>
+    - completely disabled, low quality (usually the default) and high quality</br>
+
+    - the atmosphere influences the appearance of the sky, the horizon, as well as  - well - the atmosphere between the 3d scene and the camera</br>
+    - in high quality mode we simulate light scattering by dust particles in the air, leading to a useful depth cue
+
+    - this is particularly useful for this simple base map, for other basemaps it's easier to get by without it
+
+    - lastly, the atmosphere setting also influences the appeareance at a more global scale
+
+    - the atmosphere also depends on the current lighting, as can be seen if we start the animation
+</aside>

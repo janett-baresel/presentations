@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #environmentDiv {
+      position: absolute;
+      bottom: 24px;
+      left: 12px;
+      padding: 12px;
+      background-color: rgba(255, 255, 255, 1);
+      color: black;
+      font-family: "Avenir Next W00","Helvetica Neue",Helvetica,Arial,sans-serif;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.4/esri/css/main.css">
+  <script src="https://js.arcgis.com/4.4/"></script>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/SceneView",
+      "esri/layers/SceneLayer",
+      "esri/layers/PointCloudLayer",
+      "esri/Graphic",
+      "esri/geometry/Polyline",
+      "esri/symbols/LineSymbol3D",
+      "esri/symbols/PointSymbol3D",
+      "esri/symbols/LineSymbol3DLayer",
+      "esri/symbols/TextSymbol3DLayer",
+      "esri/symbols/SimpleMarkerSymbol",
+      "esri/renderers/PointCloudStretchRenderer",
+      "esri/layers/GroupLayer",
+      "esri/widgets/LayerList",
+      "dojo/domReady!"
+    ], function(Map, SceneView, SceneLayer, PointCloudLayer, Graphic, Polyline, LineSymbol3D, PointSymbol3D, LineSymbol3DLayer, TextSymbol3DLayer, SimpleMarkerSymbol, PointCloudStretchRenderer, GroupLayer, LayerList) {
+
+      var map = new Map({
+        basemap: "dark-gray",
+        ground: "world-elevation"
+      });
+
+      var view = new SceneView({
+        container: "viewDiv",
+        map: map,
+        camera: {"position":{"x":-8244315.484483165,"y":4967864.1039647255,"z":4218.415841477923,"spatialReference":{"latestWkid":3857,"wkid":102100}},"heading":64.50912028932434,"tilt":53.35520134421849}
+      });
+
+      var pcLayer = new PointCloudLayer({
+        url: "http://tiles.arcgis.com/tiles/z2tnIkrLQ2BRzr6P/arcgis/rest/services/USGSNYC_2014_LiDAR/SceneServer"
+      });
+
+      var sceneLayer = new SceneLayer({
+        url: "https://services.arcgis.com/V6ZHFr6zdgNZuVG0/ArcGIS/rest/services/NYC/SceneServer/layers/0"
+      });
+
+      var groupLayer = new GroupLayer({
+        title: "NY Layers",
+        visibilityMode: "exclusive"
+      });
+
+      groupLayer.addMany([sceneLayer, pcLayer]);
+      map.add(groupLayer);
+
+      var symbol = new LineSymbol3D({
+        symbolLayers: [
+          new LineSymbol3DLayer({
+            material: { color: "#4CE600" },
+            size: 3
+          })
+        ]
+      });
+
+      view.then(function(){
+        var newRenderer = new PointCloudStretchRenderer({
+          field: "ELEVATION",
+          stops: [{
+            value: -1,
+            color: [61, 51, 158]
+          }, {
+            value: 1,
+            color: [73, 196, 196]
+          }, {
+            value: 5,
+            color: [104, 196, 73]
+          }, {
+            value: 10,
+            color: [235, 232, 84]
+          }, {
+            value: 20,
+            color: [235, 162, 84]
+          }, {
+            value: 60,
+            color: [235, 84, 84]
+          }, {
+            value: 90,
+            color: [255, 76, 43]
+          }]
+        });
+
+        pcLayer.renderer = newRenderer;
+
+        var layerList = new LayerList({
+          view: view
+        });
+
+        // Add widget to the top right corner of the view
+        view.ui.add(layerList, "top-right");
+      });
+
+      view.on("click", function(screenPoint) {
+        view.graphics.removeAll();
+        var hitPoint;
+
+        view.hitTest(screenPoint)
+          .then(function(hit) {
+            if (hit.results.length === 0) return;
+            hitPoint = hit.results[0].mapPoint;
+          });
+      });
+
+      // Register the events to controls
+      document.getElementById("timeOfDaySelect").addEventListener("change", updateTimeOfDay);
+      document.getElementById("directShadowsInput").addEventListener("change", updateDirectShadows);
+
+      // Create the event's callback functions
+      function updateTimeOfDay(ev) {
+        var select = ev.target;
+        var date = select.options[select.selectedIndex].value;
+
+        view.environment.lighting.date = new Date(date);
+      }
+
+      function updateDirectShadows(ev) {
+        view.environment.lighting.directShadowsEnabled = !!ev.target.checked;
+      }
+    });
+  </script>
+</head>
+
+<body>
+<div id="viewDiv"></div>
+<div id="environmentDiv">
+  <table>
+    <tr>
+      <td>Time of day:</td>
+      <td>
+        <select id="timeOfDaySelect">
+          <option value="Sun Mar 15 2015 09:00:00 GMT/-0400 (EDT)">Morning</option>
+          <option value="Sun Mar 15 2015 12:00:00 GMT/-0400 (EDT)">Noon</option>
+          <option value="Sun Mar 15 2015 16:00:00 GMT/-0400 (EDT)">Afternoon</option>
+          <option value="Sun Mar 15 2015 18:00:00 GMT/-0400 (EDT)">Evening</option>
+        </select>
+      </td>
+    </tr>
+    <tr>
+      <td>Direct shadows:</td>
+      <td><input id="directShadowsInput" type="checkbox" checked="no"></td>
+    </tr>
+  </table>
+</div>
+</body>
+</html>
